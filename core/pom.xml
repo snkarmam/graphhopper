@@ -119,6 +119,32 @@
             <artifactId>logback-classic</artifactId>
             <scope>test</scope>
         </dependency>
+
+
+
+
+
+
+        <!-- TEST-ONLY: Faker pour générer des données dans les tests -->
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>1.0.2</version>
+            <scope>test</scope>
+        </dependency>
+
+
+
+        <!-- dependency de JUnit -->
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.3</version>  <!-- Latest as of Oct 2025 -->
+            <scope>test</scope>
+        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -164,6 +190,52 @@
                     <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
                 </configuration>
             </plugin>
+
+            <!-- pitest commence ici -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+
+                <!-- version 1.20.4 -->
+                <version>1.15.0</version>
+
+                <dependencies>
+                    <!-- pour  JUnit 5  -->
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <!-- version 1.20.1 -->
+                        <version>1.2.0</version>
+                    </dependency>
+                </dependencies>
+
+                <configuration>
+                    <targetClasses>
+                        <param>com.graphhopper.util.SimpleIntDeque</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.graphhopper.util.SimpleIntDequeTest</param>
+                    </targetTests>
+
+                    <verbose>true</verbose>  <!-- For debug output -->
+                    <timestampedReports>false</timestampedReports>
+                    <threads>2</threads>  <!-- selon la machine -->
+
+
+                    <!-- augmentation de memoire  -->
+                    <jvmArgs>
+                        <jvmArg>-Xmx4g</jvmArg>  <!-- Start with 2 GB; increase to 4g or more if needed -->
+                        <jvmArg>-Xms2g</jvmArg>
+                    </jvmArgs>
+
+
+                    <timeoutFactor>2.0</timeoutFactor>  <!-- Doubles default 1.25 -->
+                    <timeoutConstant>5000</timeoutConstant>  <!-- Adds 5s buffer -->
+
+                </configuration>
+            </plugin>
+            <!-- pitest finit ici -->
+
         </plugins>
 
         <!-- make version available at runtime via version file -->
