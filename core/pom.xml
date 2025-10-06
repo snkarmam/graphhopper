@@ -140,7 +140,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.10.3</version>  <!-- Latest as of Oct 2025 -->
             <scope>test</scope>
         </dependency>
 

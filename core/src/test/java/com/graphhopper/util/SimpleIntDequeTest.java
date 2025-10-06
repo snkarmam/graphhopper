@@ -17,10 +17,9 @@
  */
 package com.graphhopper.util;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Karich
@@ -219,4 +218,67 @@ public class SimpleIntDequeTest {
         dq.pop(); dq.pop();
         assertEquals("0, 2, 2, -3", dq.toString());
     }
+    
+     /*
+     Intention : valider que toString() formate correctement une séquence d’entiers
+     variés (négatifs/positifs/0, doublons possibles) générée via java-faker, et que
+     l’ordre FIFO est respecté avant/après quelques pops — le tout SANS utiliser
+     java.util.Random dans le code de test.
+
+     Justification du choix de java-faker :
+       - Génère rapidement des données hétérogènes pour “stresser” le formatage
+         (séparateur exact ", ", absence d’espaces parasites, ordre FIFO).
+       - On reste déterministes PAR CONSTRUCTION : on enregistre les valeurs
+         générées puis on construit l’oracle à partir de ces mêmes valeurs.
+         Aucune graine ni Random n’est nécessaire côté test.
+     Données :
+       - faker = new com.github.javafaker.Faker(new java.util.Locale("fr"))
+       - N = 20 entiers dans [-1000, 1000]
+       - pop() 5 fois pour vérifier le rendu après avancement du frontIndex.
+     Oracle :
+       - Avant pops : "v0, v1, ..., v19"
+       - Après pops : "v5, v6, ..., v19"
+       - toString() est idempotent (deux appels successifs identiques).
+     */
+    @Test
+    public void toString_withFaker_noRandom_orderAndSeparators() {
+        com.github.javafaker.Faker faker = new com.github.javafaker.Faker(new java.util.Locale("fr"));
+        SimpleIntDeque dq = new SimpleIntDeque(4, 2f);
+
+        final int N = 20;
+        int[] vals = new int[N];
+
+        // Génération via Faker (pas d’usage explicite de java.util.Random dans ce test)
+        for (int i = 0; i < N; i++) {
+            vals[i] = faker.number().numberBetween(-1000, 1001); // [-1000, 1000]
+            dq.push(vals[i]);
+        }
+
+        // Oracle avant pops
+        StringBuilder expected = new StringBuilder();
+        for (int i = 0; i < N; i++) {
+            if (i > 0) expected.append(", ");
+            expected.append(vals[i]);
+        }
+        assertEquals(expected.toString(), dq.toString(), "Format/séparateurs avant pops");
+
+        // Pop de 5 éléments pour tester le rendu après avancement du frontIndex
+        final int POPS = 5;
+        for (int i = 0; i < POPS; i++) dq.pop();
+
+        // Oracle après pops
+        expected.setLength(0);
+        for (int i = POPS; i < N; i++) {
+            if (i > POPS) expected.append(", ");
+            expected.append(vals[i]);
+        }
+        assertEquals(expected.toString(), dq.toString(), "Format/séparateurs après pops");
+
+        // Idempotence : deux appels successifs ne doivent rien changer
+        String s1 = dq.toString();
+        String s2 = dq.toString();
+        assertEquals(s1, s2, "toString() doit être idempotent");
+    }
+
 }
+
