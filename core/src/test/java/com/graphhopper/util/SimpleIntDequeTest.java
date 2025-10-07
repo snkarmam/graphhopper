@@ -80,9 +80,7 @@ public class SimpleIntDequeTest {
     }
 
 
-    /**
-     * Nos cas des tests commencent ici (toString()).
-     */
+
 
     /**
      * Nos cas des tests commencent ici (toString()).
