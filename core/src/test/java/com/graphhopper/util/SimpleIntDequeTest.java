@@ -93,8 +93,9 @@ public class SimpleIntDequeTest {
      * Étapes :
      *  - Arrange : créer une deque vide
      *  - Act     : appeler toString()
-     *  - Assert  : comparer avec ""
+     *  - Assert  : comparer avec ""\
      */
+
     @Test
     public void toString_ReturnsEmptyString_WhenDequeIsEmpty() {
         // Intention : vérifier que toString() d’une deque vide est "".
@@ -118,8 +119,10 @@ public class SimpleIntDequeTest {
      *  - Act     : toString()
      *  - Assert  : "42" et absence de virgule
      */
+
     @Test
     public void toString_ReturnsSingleValue_WithoutComma() {
+    
         // Intention : un seul élément ne doit pas introduire de séparateur.
         // Oracle : "42" et aucune virgule dans la chaîne.
         // Arrange
@@ -129,22 +132,24 @@ public class SimpleIntDequeTest {
         // Act
         String s = dq.toString();
 
-        // Assert
+        // Asserta
         assertEquals("42", s);
         org.junit.jupiter.api.Assertions.assertFalse(s.contains(","), "Single element must not contain commas");
     }
 
     /**
-     * Test 3 — toString() formate deux éléments avec le séparateur exact ", ".
-     * Intention : Vérifier le séparateur et l’absence de séparateurs en tête/fin.
+     * Test 3 — toString() formate 2 éléments avec le séparateur exact ", ".
+     * Intention : Vérifie le séparateur et l’absence de séparateurs en tête/fin.
      * Oracle : "10, 20" (exactement virgule + espace).
      * Étapes :
      *  - Arrange : push(10), push(20)
      *  - Act     : toString()
-     *  - Assert  : "10, 20" et pas de séparateur en tête/fin
+     *  - Assert  : "10, 20" et pas de séparateurs en tête et en  fin
      */
+
     @Test
     public void toString_FormatsTwoElements_WithSingleCommaSpace() {
+
         // Intention : confirmer le séparateur exact entre deux éléments.
         // Oracle : "10, 20" (exactement ", ", sans séparateur en tête/fin).
         // Arrange
@@ -162,17 +167,19 @@ public class SimpleIntDequeTest {
 
     /**
      * Test 4 — toString() reflète le nouveau front après un pop().
-     * Intention : Après pop(), le premier élément affiché doit changer.
+     * Intention : Après le pop(), le premier élément affiché doit changé.
      * Oracle : pour [7,8,9] puis pop() → "8, 9".
      * Étapes :
      *  - Arrange : push(7), push(8), push(9)
      *  - Act     : pop(), toString()
      *  - Assert  : "8, 9"
      */
+
     @Test
     public void toString_ReflectsFrontShift_AfterOnePop() {
-        // Intention : après pop(), la chaîne doit refléter le nouveau front.
-        // Oracle : [7,8,9] puis pop() -> "8, 9".
+
+        // Intention : après pop() la chaîne doit refléter le nouveau front
+        // Oracle : [7,8,9] puis pop() => "8, 9"
         // Arrange
         SimpleIntDeque dq = new SimpleIntDeque();
         dq.push(7);
@@ -180,7 +187,8 @@ public class SimpleIntDequeTest {
         dq.push(9);
 
         // Act
-        dq.pop(); // remove 7
+        // Supprime 7. Il doit donc rester [8,9]
+        dq.pop();  
         String s = dq.toString();
 
         // Assert
@@ -189,15 +197,17 @@ public class SimpleIntDequeTest {
 
     /**
      * Test 5 — toString() redevient vide après avoir tout dépilé.
-     * Intention : Le rendu doit redevenir "" quand la deque est vidée.
+     * Intention : Le rendu doit redevenir "" qd la deque est vidée.
      * Oracle : "" après le dernier pop().
      * Étapes :
      *  - Arrange : push(1)
      *  - Act     : pop(), toString()
      *  - Assert  : ""
      */
+
     @Test
     public void toString_ReturnsEmptyString_AfterPoppingAllElements() {
+
         // Intention : vider la deque doit donner une chaîne vide.
         // Oracle : "" après le dernier pop().
         // Arrange
@@ -221,15 +231,17 @@ public class SimpleIntDequeTest {
      *  - Act     : toString()
      *  - Assert  : "0, 1, 2, 3, 4"
      */
+
     @Test
     public void toString_HandlesGrowth_WhenPushingBeyondCapacity() {
+
         // Intention : la croissance de capacité ne doit pas changer la mise en forme.
         // Oracle : initSize=2, push 0..4 -> "0, 1, 2, 3, 4".
         // Arrange
-        SimpleIntDeque dq = new SimpleIntDeque(2); // small to force growth
+        SimpleIntDeque dq = new SimpleIntDeque(2); 
         dq.push(0);
         dq.push(1);
-        dq.push(2); // triggers growth
+        dq.push(2); 
         dq.push(3);
         dq.push(4);
 
@@ -241,7 +253,7 @@ public class SimpleIntDequeTest {
     }
 
     /**
-     * Test 7 — toString() reste correct après la compaction du front (branche pop()).
+     * Test 7 — toString() reste bln après la compaction du front (branche pop()).
      * Intention : Couvrir la branche qui compacte le tableau quand trop d’éléments ont été dépilés.
      * Oracle : initSize=12, push 0..11, pop 7 → "7, 8, 9, 10, 11".
      * Étapes :
@@ -249,16 +261,18 @@ public class SimpleIntDequeTest {
      *  - Act     : pop() × 7, toString()
      *  - Assert  : "7, 8, 9, 10, 11"
      */
+
     @Test
     public void toString_RemainsCorrect_AfterFrontCompactionOnPop() {
-        // Intention : tester la compaction du front exécutée dans pop().
+
+        // Intention : tester la compaction du front exécuter dans pop().
         // Oracle : initSize=12, push 0..11, puis pop 7 fois → "7, 8, 9, 10, 11".
         // Arrange
-        SimpleIntDeque dq = new SimpleIntDeque(12); // growFactor defaults to 2
+        SimpleIntDeque dq = new SimpleIntDeque(12); 
         for (int i = 0; i < 12; i++) dq.push(i);
 
         // Act
-        for (int i = 0; i < 7; i++) dq.pop(); // triggers compaction
+        for (int i = 0; i < 7; i++) dq.pop();  
         String s = dq.toString();
 
         // Assert
@@ -267,15 +281,17 @@ public class SimpleIntDequeTest {
 
     /**
      * Test 8 — toString() gère les valeurs extrêmes d’entiers.
-     * Intention : Valider que les bornes int sont rendues telles quelles.
+     * Intention : Valider que les bornes int sont rendues telquel.
      * Oracle : "-2147483648, 0, 2147483647".
      * Étapes :
      *  - Arrange : push(Integer.MIN_VALUE), push(0), push(Integer.MAX_VALUE)
      *  - Act     : toString()
      *  - Assert  : "-2147483648, 0, 2147483647"
      */
+
     @Test
     public void toString_HandlesExtremeIntegerValues() {
+
         // Intention : les extrêmes doivent être rendus verbatim sans artefact.
         // Oracle : "-2147483648, 0, 2147483647".
         // Arrange
@@ -293,17 +309,19 @@ public class SimpleIntDequeTest {
 
     /**
      * Test 9 — toString() correct après vidage complet puis réutilisation.
-     * Intention : Après avoir tout dépilé, un nouvel usage doit formater correctement.
-     * Oracle : après drain → "", puis push [4,5] → "4, 5".
+     * Intention : Après avoir tout dépilé un nouvel usage doit formater correctement.
+     * Oracle : après drain on a "", puis push [4,5] on a  "4, 5".
      * Étapes :
      *  - Arrange : push(1,2,3), pop×3
      *  - Act     : toString() (vide), puis push(4,5), toString()
      *  - Assert  : "" puis "4, 5"
      */
+
     @Test
     public void toString_CorrectAfterDrainingThenReusing() {
+
         // Intention : réutilisation propre après un vidage complet.
-        // Oracle : après drain -> "", puis push [4,5] -> "4, 5".
+        // Oracle : après drain on a  "", puis push [4,5] on a  "4, 5".
         // Arrange
         SimpleIntDeque dq = new SimpleIntDeque();
         dq.push(1);
@@ -311,7 +329,7 @@ public class SimpleIntDequeTest {
         dq.push(3);
         dq.pop();
         dq.pop();
-        dq.pop(); // now empty
+        dq.pop(); 
 
         // Act
         String sEmpty = dq.toString();
@@ -325,7 +343,7 @@ public class SimpleIntDequeTest {
     }
 
     /**
-     * Test 10 — toString() reste correct avec séquence entremêlée push/pop.
+     * Test 10 — toString() reste correct avec séquence entremélée push/pop.
      * Intention : Cas réaliste (mélange d’opérations) — ordre FIFO et séparateurs intacts.
      * Oracle : push[1..5], pop×2, push[6,7,8] → "3, 4, 5, 6, 7, 8".
      * Étapes :
@@ -335,6 +353,7 @@ public class SimpleIntDequeTest {
      */
     @Test
     public void toString_ReflectsInterleavedPushPopSequences() {
+
         // Intention : avec opérations entremêlées, l’ordre et le séparateur doivent rester corrects.
         // Oracle : push [1..5], pop 2 → [3,4,5], puis push [6,7,8] → "3, 4, 5, 6, 7, 8".
         // Arrange
@@ -346,8 +365,8 @@ public class SimpleIntDequeTest {
         dq.push(5);
 
         // Act
-        dq.pop(); // remove 1
-        dq.pop(); // remove 2
+        dq.pop(); 
+        dq.pop(); 
         dq.push(6);
         dq.push(7);
         dq.push(8);
