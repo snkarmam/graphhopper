@@ -83,19 +83,21 @@ public class SimpleIntDequeTest {
 
 
 
-/*
-     Nos 10 tests commencent ici
+    /*
+     Nos 10 tests commencent là
      */
 
 
     /*
-     Intention : vérifier que toString() d’une file vide renvoie une chaîne vide (aucun espace/virgule).
+     Intention : vérifier que toString() d’une file vide renvoie bien une chaîne vide ( et donc y a aucun espace/virgule).
      Données : deque fraîchement créée (capacité 4, grow=2).
      Oracle : "" (chaîne de longueur 0).
      */
+
     @Test
     public void toString_empty_returnsEmptyString() {
         SimpleIntDeque dq = new SimpleIntDeque(4, 2f);
+
         assertEquals("", dq.toString());
     }
 
@@ -104,48 +106,56 @@ public class SimpleIntDequeTest {
      Données : push(-5).
      Oracle : "-5".
      */
+
     @Test
     public void toString_singleNegative_noCommaOrSpace() {
         SimpleIntDeque dq = new SimpleIntDeque(4, 2f);
         dq.push(-5);
+
         assertEquals("-5", dq.toString());
     }
 
     /*
-     Intention : deux éléments doivent être séparés exactement par ", " (virgule+espace).
+     Intention : 2 éléments doivent être séparés exactement par ", ".
      Données : push(1), push(2).
      Oracle : "1, 2".
      */
+
     @Test
     public void toString_twoElements_commaSpaceSeparator() {
         SimpleIntDeque dq = new SimpleIntDeque(4, 2f);
         dq.push(1);
         dq.push(2);
+
         assertEquals("1, 2", dq.toString());
     }
 
     /*
-     Intention : plusieurs éléments doivent être listés dans l’ordre FIFO avec séparateur correct.
+     Intention : Olusieurs elemnts doivent être listés dans l’ordre FIFO avec séparateur correct.
      Données : push(0..4).
      Oracle : "0, 1, 2, 3, 4".
      */
+
     @Test
     public void toString_multipleElements_orderAndSeparators() {
         SimpleIntDeque dq = new SimpleIntDeque(4, 2f);
         for (int i = 0; i <= 4; i++) dq.push(i);
+
         assertEquals("0, 1, 2, 3, 4", dq.toString());
     }
 
     /*
-     Intention : après des pops (frontIndex > 0), il ne doit pas y avoir de virgule/espaces en tête.
+     Intention : après des pops (frontIndex > 0), il ne doit pas pas y avoir de virgule/espaces en tête.
      Données : push(0..4), pop() x3 -> restent [3,4].
      Oracle : "3, 4".
      */
+
     @Test
     public void toString_afterPops_noLeadingCommaOrSpace() {
         SimpleIntDeque dq = new SimpleIntDeque(8, 2f);
         for (int i = 0; i <= 4; i++) dq.push(i);
         dq.pop(); dq.pop(); dq.pop();
+
         assertEquals("3, 4", dq.toString());
     }
 
@@ -154,66 +164,76 @@ public class SimpleIntDequeTest {
      Données : init(10,2), push(0..9), pop() x6 -> compactage; restent [6,7,8,9].
      Oracle : "6, 7, 8, 9".
      */
+
     @Test
     public void toString_afterCompaction_correctContentAndFormat() {
         SimpleIntDeque dq = new SimpleIntDeque(10, 2f);
         for (int i = 0; i < 10; i++) dq.push(i);
-        for (int i = 0; i < 6; i++) dq.pop(); // frontIndex dépasse floor(10/2)=5 => compactage
+        for (int i = 0; i < 6; i++) dq.pop();
+
         assertEquals("6, 7, 8, 9", dq.toString());
     }
 
     /*
-     Intention : après croissance (copyOf) due au dépassement de capacité, l’ordre et la mise en forme restent corrects.
+     Intention : après croissance dûe au dépassement de capacité, l’ordre et la mise en forme restent corrects.
      Données : init(2,2), push(0..4) => croissance 2->4->8.
      Oracle : "0, 1, 2, 3, 4".
      */
+
     @Test
     public void toString_acrossGrowthBoundary_preservesOrderAndFormat() {
         SimpleIntDeque dq = new SimpleIntDeque(2, 2f);
         for (int i = 0; i <= 4; i++) dq.push(i);
+
         assertEquals("0, 1, 2, 3, 4", dq.toString());
     }
 
     /*
-     Intention : valeurs extrêmes doivent être rendues telles quelles et dans l’ordre.
+     Intention : Les valeurs extrêmes doivent être rendues telles quelles et dans l’ordre.
      Données : push(Integer.MIN_VALUE), push(0), push(Integer.MAX_VALUE).
      Oracle : "<MIN>, 0, <MAX>".
      */
+
     @Test
     public void toString_extremeInts_renderExactly() {
         SimpleIntDeque dq = new SimpleIntDeque(3, 2f);
         dq.push(Integer.MIN_VALUE);
         dq.push(0);
         dq.push(Integer.MAX_VALUE);
+
         assertEquals(Integer.MIN_VALUE + ", 0, " + Integer.MAX_VALUE, dq.toString());
     }
 
     /*
-     Intention : idempotence et absence d’effet de bord — appeler toString() n’altère pas l’état.
+     Intention : idempotence et absence d’effet de bord appeler toString() n’altère pas l’état.
      Données : push(1,2,3), appeler toString() deux fois puis pop().
      Oracle : deux rendus identiques "1, 2, 3" et pop() renvoie 1 (preuve que toString n’a rien modifié).
      */
+
     @Test
     public void toString_isIdempotent_andDoesNotMutateState() {
         SimpleIntDeque dq = new SimpleIntDeque(4, 2f);
         dq.push(1); dq.push(2); dq.push(3);
         String s1 = dq.toString();
         String s2 = dq.toString();
+
         assertEquals("1, 2, 3", s1);
         assertEquals(s1, s2);
         assertEquals(1, dq.pop(), "toString() ne doit pas muter l’ordre/état interne");
     }
 
     /*
-     Intention : doublons et négatifs — vérifier rendu correct y compris après pops partiels.
+     Intention : doublons et négatifs vérifier rendu correct y compris après pops partiels.
      Données : push(-1,-1,0,2,2,-3), puis pop() x2 -> restent [0,2,2,-3].
      Oracle : avant pops "-1, -1, 0, 2, 2, -3", après pops "0, 2, 2, -3".
      */
+
     @Test
     public void toString_duplicatesAndNegatives_beforeAndAfterPops() {
         SimpleIntDeque dq = new SimpleIntDeque(8, 2f);
         int[] vals = {-1, -1, 0, 2, 2, -3};
         for (int v : vals) dq.push(v);
+
         assertEquals("-1, -1, 0, 2, 2, -3", dq.toString());
         dq.pop(); dq.pop();
         assertEquals("0, 2, 2, -3", dq.toString());
@@ -221,16 +241,13 @@ public class SimpleIntDequeTest {
     
      /*
      Intention : valider que toString() formate correctement une séquence d’entiers
-     variés (négatifs/positifs/0, doublons possibles) générée via java-faker, et que
-     l’ordre FIFO est respecté avant/après quelques pops — le tout SANS utiliser
-     java.util.Random dans le code de test.
+     varié (négatifs/positifs/0, doublons possibles) générée via java-faker, et que
+     l’ordre FIFO est respecte avant/après quelques pops
 
-     Justification du choix de java-faker :
-       - Génère rapidement des données hétérogènes pour “stresser” le formatage
+     Justification du choix d'utlisation de java-faker :
+       - Génère rapidement des données hétérogènes pour stresser le formatage
          (séparateur exact ", ", absence d’espaces parasites, ordre FIFO).
-       - On reste déterministes PAR CONSTRUCTION : on enregistre les valeurs
-         générées puis on construit l’oracle à partir de ces mêmes valeurs.
-         Aucune graine ni Random n’est nécessaire côté test.
+       - On enregistre les valeurs générées puis on construit l’oracle à partir de ces mêmes valeurs.
      Données :
        - faker = new com.github.javafaker.Faker(new java.util.Locale("fr"))
        - N = 20 entiers dans [-1000, 1000]
@@ -248,7 +265,7 @@ public class SimpleIntDequeTest {
         final int N = 20;
         int[] vals = new int[N];
 
-        // Génération via Faker (pas d’usage explicite de java.util.Random dans ce test)
+        // Génération via Faker 
         for (int i = 0; i < N; i++) {
             vals[i] = faker.number().numberBetween(-1000, 1001); // [-1000, 1000]
             dq.push(vals[i]);
