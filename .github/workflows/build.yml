@@ -2,6 +2,8 @@ name: Build and Test
 
 on:
   push:
+  pull_request:
+  workflow_dispatch:
 
 # Needed so the workflow can commit the updated mutation-score.txt
 permissions:
