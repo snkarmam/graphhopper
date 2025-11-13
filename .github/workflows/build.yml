@@ -2,8 +2,6 @@ name: Build and Test
 
 on:
   push:
-  pull_request:
-  workflow_dispatch:
 
 # Needed so the workflow can commit the updated mutation-score.txt
 permissions:
@@ -47,16 +45,16 @@ jobs:
           path: web-bundle/node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pom.xml', '**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-modules-
+            ${{ runner.os }}-node-modules- }
 
 
     ####### Notre modification commence ici ###########
 
-      - name: Build and unit tests
-        run: mvn -B clean test
-
-      - name: Run mutation tests
-        run: mvn -B org.pitest:pitest-maven:mutationCoverage
+      # Run build, unit tests and mutation tests in a single Maven invocation.
+      # This avoids the PIT '{argLine}' bug that happens when mutationCoverage
+      # is run alone in a separate Maven command.
+      - name: Build, unit tests and mutation tests
+        run: mvn -B clean test org.pitest:pitest-maven:mutationCoverage
 
       - name: Extract mutation score
         id: mutation
