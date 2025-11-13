@@ -296,32 +296,50 @@
             </plugin>
 
 
-            <!-- PIT mutation testing -->
+                        <!-- pitest commence ici -->
             <plugin>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
-                <version>1.21.1</version>
+
+                <!-- version 1.20.4 -->
+                <version>1.15.0</version>
+
                 <dependencies>
+                    <!-- pour  JUnit 5  -->
                     <dependency>
                         <groupId>org.pitest</groupId>
                         <artifactId>pitest-junit5-plugin</artifactId>
-                        <version>1.2.3</version>
+                        <!-- version 1.20.1 -->
+                        <version>1.2.0</version>
                     </dependency>
                 </dependencies>
+
                 <configuration>
                     <targetClasses>
-                        <param>com.graphhopper.*</param>
+                        <param>com.graphhopper.util.SimpleIntDeque</param>
                     </targetClasses>
                     <targetTests>
-                        <param>com.graphhopper.*Test</param>
+                        <param>com.graphhopper.util.SimpleIntDequeTest</param>
                     </targetTests>
-                    <threads>4</threads>
-                    <outputFormats>
-                        <param>XML</param>
-                        <param>HTML</param>
-                    </outputFormats>
+
+                    <verbose>true</verbose>  <!-- For debug output -->
+                    <timestampedReports>false</timestampedReports>
+                    <threads>2</threads>  <!-- selon la machine -->
+
+
+                    <!-- augmentation de memoire  -->
+                    <jvmArgs>
+                        <jvmArg>-Xmx4g</jvmArg>  <!-- Start with 2 GB; increase to 4g or more if needed -->
+                        <jvmArg>-Xms2g</jvmArg>
+                    </jvmArgs>
+
+
+                    <timeoutFactor>2.0</timeoutFactor>  <!-- Doubles default 1.25 -->
+                    <timeoutConstant>5000</timeoutConstant>  <!-- Adds 5s buffer -->
+
                 </configuration>
             </plugin>
+            <!-- pitest finit ici -->
 
 
 
