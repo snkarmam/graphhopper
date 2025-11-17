@@ -55,6 +55,146 @@ public class BaseGraphTest extends AbstractGraphStorageTester {
         return new BaseGraph.Builder(encodingManager).setDir(dir).set3D(enabled3D).setSegmentSize(segmentSize).build();
     }
 
+
+
+
+
+
+    // les mockitos commencent ici
+
+
+
+    @Test
+    public void testBuilder_withTurnCostsEnabled_wrapWeightingReturnsSameInstance() {
+        // Mockito mocks pour deux dépendances différentes :
+        // - EncodingManager (utilisé par BaseGraph.Builder)
+        // - Weighting       (utilisé par BaseGraph.wrapWeighting)
+        com.graphhopper.routing.util.EncodingManager encodingManagerMock =
+                org.mockito.Mockito.mock(com.graphhopper.routing.util.EncodingManager.class);
+        com.graphhopper.routing.weighting.Weighting weightingMock =
+                org.mockito.Mockito.mock(com.graphhopper.routing.weighting.Weighting.class);
+
+        // Configuration du mock EncodingManager : turn costs activés
+        org.mockito.Mockito.when(encodingManagerMock.getBytesForFlags()).thenReturn(8);
+        org.mockito.Mockito.when(encodingManagerMock.needsTurnCostsSupport()).thenReturn(true);
+
+        // Construction du BaseGraph via le Builder dépendant de EncodingManager
+        BaseGraph.Builder builder = new BaseGraph.Builder(encodingManagerMock);
+        BaseGraph graph = builder.create();
+        try {
+            // Si needsTurnCostsSupport() == true, le graphe doit supporter les turn costs
+            assertTrue(graph.supportsTurnCosts(),
+                    "Graph should support turn costs when EncodingManager.needsTurnCostsSupport() is true");
+
+            // wrapWeighting doit renvoyer exactement la même instance de Weighting
+            com.graphhopper.routing.weighting.Weighting wrapped = graph.wrapWeighting(weightingMock);
+            assertSame(weightingMock, wrapped,
+                    "wrapWeighting must return the same Weighting instance that was passed in");
+
+            // Vérifier les interactions avec le mock EncodingManager
+            org.mockito.Mockito.verify(encodingManagerMock).getBytesForFlags();
+            org.mockito.Mockito.verify(encodingManagerMock).needsTurnCostsSupport();
+            org.mockito.Mockito.verifyNoMoreInteractions(encodingManagerMock);
+
+            // Aucune méthode de Weighting n'est appelée par wrapWeighting
+            org.mockito.Mockito.verifyNoInteractions(weightingMock);
+        } finally {
+            graph.close();
+        }
+    }
+
+    @Test
+    public void testBuilder_withTurnCostsDisabled_wrapWeightingReturnsSameInstance() {
+        com.graphhopper.routing.util.EncodingManager encodingManagerMock =
+                org.mockito.Mockito.mock(com.graphhopper.routing.util.EncodingManager.class);
+        com.graphhopper.routing.weighting.Weighting weightingMock =
+                org.mockito.Mockito.mock(com.graphhopper.routing.weighting.Weighting.class);
+
+        // Cette fois, EncodingManager indique qu'on ne veut pas de turn costs
+        org.mockito.Mockito.when(encodingManagerMock.getBytesForFlags()).thenReturn(8);
+        org.mockito.Mockito.when(encodingManagerMock.needsTurnCostsSupport()).thenReturn(false);
+
+        BaseGraph.Builder builder = new BaseGraph.Builder(encodingManagerMock);
+        BaseGraph graph = builder.create();
+        try {
+            // Si needsTurnCostsSupport() == false, le graphe ne doit pas supporter les turn costs
+            assertFalse(graph.supportsTurnCosts(),
+                    "Graph must not support turn costs when EncodingManager.needsTurnCostsSupport() is false");
+
+            com.graphhopper.routing.weighting.Weighting wrapped = graph.wrapWeighting(weightingMock);
+            assertSame(weightingMock, wrapped,
+                    "wrapWeighting must always return the same Weighting instance");
+
+            org.mockito.Mockito.verify(encodingManagerMock).getBytesForFlags();
+            org.mockito.Mockito.verify(encodingManagerMock).needsTurnCostsSupport();
+            org.mockito.Mockito.verifyNoMoreInteractions(encodingManagerMock);
+            org.mockito.Mockito.verifyNoInteractions(weightingMock);
+        } finally {
+            graph.close();
+        }
+    }
+
+    @Test
+    public void testCreateEdgeExplorer_withMockedEdgeFilter_usesFilterToDecideEdges() {
+        BaseGraph graph = createGHStorage();
+        graph.edge(0, 1).setDistance(10).set(carAccessEnc, true, true);
+        graph.edge(0, 2).setDistance(20).set(carAccessEnc, true, true);
+
+        // Mock d'un EdgeFilter personnalisé
+        com.graphhopper.routing.util.EdgeFilter filter =
+                org.mockito.Mockito.mock(com.graphhopper.routing.util.EdgeFilter.class);
+
+        // Le filtre rejette toutes les arêtes
+        org.mockito.Mockito.when(filter.accept(org.mockito.Mockito.any()))
+                .thenReturn(false);
+
+        EdgeExplorer explorer = graph.createEdgeExplorer(filter);
+        EdgeIterator iter = explorer.setBaseNode(0);
+
+        // Même si le nœud 0 a des voisins, le filtre doit les bloquer tous
+        assertFalse(iter.next(), "No edges should be returned when the filter rejects all edges");
+
+        // Vérifier que le filtre a bien été consulté
+        org.mockito.Mockito.verify(filter, org.mockito.Mockito.atLeastOnce())
+                .accept(org.mockito.Mockito.any());
+    }
+
+    @Test
+    public void testSortEdges_withMockedIntUnaryOperator_invokesMappingFunction() {
+        BaseGraph graph = createGHStorage();
+        graph.edge(0, 1).setDistance(10).set(carAccessEnc, true, true);
+        graph.edge(1, 2).setDistance(20).set(carAccessEnc, true, true);
+
+        // Mock de l'IntUnaryOperator utilisé par sortEdges
+        java.util.function.IntUnaryOperator mapping =
+                org.mockito.Mockito.mock(java.util.function.IntUnaryOperator.class);
+
+        // Mapping identité : newEdge = oldEdge
+        org.mockito.Mockito.when(mapping.applyAsInt(org.mockito.Mockito.anyInt()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        graph.sortEdges(mapping);
+
+        // Vérifier que BaseGraph (via son store) a bien utilisé la fonction de mapping fournie
+        org.mockito.Mockito.verify(mapping, org.mockito.Mockito.atLeastOnce())
+                .applyAsInt(org.mockito.Mockito.anyInt());
+    }
+
+
+    // les mockitos finnissent ici
+
+
+
+
+
+
+
+
+
+
+
+
+
     @Test
     public void testSave_and_fileFormat() {
         graph = newGHStorage(new RAMDirectory(defaultGraphLoc, true), true).create(defaultSize);
