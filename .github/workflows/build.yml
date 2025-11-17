@@ -55,9 +55,10 @@ jobs:
         if: matrix.java-version != '24'
         run: mvn -pl web-api -am -B clean test
 
-      - name: Build, unit tests and mutation tests (core, Java 24)
+      - name: Build, unit tests and mutation tests (web-api, Java 24)
         if: matrix.java-version == '24'
-        run: mvn -pl core -am -B clean test org.pitest:pitest-maven:mutationCoverage
+        run: mvn -pl web-api -am -B clean test org.pitest:pitest-maven:mutationCoverage
+
 
 
       - name: Debug PIT report paths
