@@ -79,7 +79,6 @@ jobs:
           elif [ -f web-api/target/pit-reports/index.html ]; then
             REPORT_FILE="web-api/target/pit-reports/index.html"
           else
-            # dernier recours : le premier index.html trouvé dans le repo
             REPORT_FILE=$(find . -path "*pit-reports/index.html" -print | head -n1 || true)
           fi
 
@@ -92,12 +91,14 @@ jobs:
 
           echo "=== Extracting from Project Summary table only ==="
           # On se limite AU TABLEAU "Project Summary"
-          # On prend tout ce qui est entre <h3>Project Summary</h3> et le premier </table>
-          RAW_PCTS=$(sed -n '/<h3>Project Summary<\/h3>/,/<\/table>/p' "$REPORT_FILE" | grep -o '[0-9]\+%')
+          sed -n '/<h3>Project Summary<\/h3>/,/<\/table>/p' "$REPORT_FILE" > /tmp/project_summary.html
+
+          RAW_PCTS=$(grep -o '[0-9]\+%' /tmp/project_summary.html || true)
+
           echo "Percents in Project Summary (in order):"
           echo "$RAW_PCTS"
 
-          # Dans ce bloc, on s’attend à :
+          # Dans ce bloc :
           #   1er % = Line Coverage
           #   2e % = Mutation Coverage  ← celui qu’on veut
           SCORE=$(echo "$RAW_PCTS" | sed -n '2p' | tr -d '%')
