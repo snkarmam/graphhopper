@@ -71,8 +71,17 @@ jobs:
         if: matrix.java-version == '24'
         id: mutation
         run: |
-          # On cherche l'index PIT dans les différents modules possibles
-          REPORT_FILE=$(find core/target/pit-reports target/pit-reports web-api/target/pit-reports -type f -name "index.html" 2>/dev/null | head -n1 || true)
+          echo "=== Detecting PIT report index.html ==="
+
+          # 1) On privilégie explicitement core, puis web-api, puis fallback
+          if [ -f core/target/pit-reports/index.html ]; then
+            REPORT_FILE="core/target/pit-reports/index.html"
+          elif [ -f web-api/target/pit-reports/index.html ]; then
+            REPORT_FILE="web-api/target/pit-reports/index.html"
+          else
+            # dernier recours : le premier index.html trouvé dans le repo
+            REPORT_FILE=$(find . -path "*pit-reports/index.html" -print | head -n1 || true)
+          fi
 
           if [ -z "$REPORT_FILE" ]; then
             echo "No PIT index.html report found"
@@ -81,28 +90,31 @@ jobs:
 
           echo "Using PIT report: $REPORT_FILE"
 
-          # On récupère tous les pourcentages du fichier dans l'ordre d'apparition
-          # Dans ton index.html :
-          #   1er % = Line Coverage (Project Summary)
-          #   2e % = Mutation Coverage (Project Summary)  ← celui qu’on veut
-          RAW_PCTS=$(grep -o '[0-9][0-9]*%' "$REPORT_FILE")
-          echo "All percents in index.html (in order): $RAW_PCTS"
+          echo "=== Extracting from Project Summary table only ==="
+          # On se limite AU TABLEAU "Project Summary"
+          # On prend tout ce qui est entre <h3>Project Summary</h3> et le premier </table>
+          RAW_PCTS=$(sed -n '/<h3>Project Summary<\/h3>/,/<\/table>/p' "$REPORT_FILE" | grep -o '[0-9]\+%')
+          echo "Percents in Project Summary (in order):"
+          echo "$RAW_PCTS"
 
-          # On prend le 2e pourcentage
+          # Dans ce bloc, on s’attend à :
+          #   1er % = Line Coverage
+          #   2e % = Mutation Coverage  ← celui qu’on veut
           SCORE=$(echo "$RAW_PCTS" | sed -n '2p' | tr -d '%')
 
-          # Sécurité : si jamais il n'y a pas de 2e %, on prend le dernier trouvé
+          # Sécurité : si jamais il n'y a pas de 2e %, on prend le dernier du Project Summary
           if [ -z "$SCORE" ]; then
             SCORE=$(echo "$RAW_PCTS" | tail -n1 | tr -d '%')
           fi
 
           if [ -z "$SCORE" ]; then
-            echo "Mutation coverage percent not found in $REPORT_FILE"
+            echo "Mutation coverage percent not found in Project Summary of $REPORT_FILE"
             exit 1
           fi
 
-          echo "Mutation coverage (percent only): $SCORE%"
+          echo "Final mutation coverage (Project Summary, percent only): $SCORE%"
           echo "mutation_score=$SCORE" >> "$GITHUB_OUTPUT"
+
 
       - name: Compare mutation score with previous run
         if: matrix.java-version == '24'
