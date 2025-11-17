@@ -71,21 +71,27 @@ jobs:
         if: matrix.java-version == '24'
         id: mutation
         run: |
-          REPORT_FILE=$(find target/pit-reports web-api/target/pit-reports -type f -name "index.html" 2>/dev/null | head -n1 || true)
+          # On cherche l'index PIT dans les différents modules possibles
+          REPORT_FILE=$(find core/target/pit-reports target/pit-reports web-api/target/pit-reports -type f -name "index.html" 2>/dev/null | head -n1 || true)
+
           if [ -z "$REPORT_FILE" ]; then
             echo "No PIT index.html report found"
             exit 1
           fi
+
           echo "Using PIT report: $REPORT_FILE"
 
-          # On récupère les pourcentages qui apparaissent juste après "Mutation Coverage"
-          RAW_PCTS=$(grep -A10 "Mutation Coverage" "$REPORT_FILE" | grep -o '[0-9][0-9]*%')
-          echo "Percents found after 'Mutation Coverage': $RAW_PCTS"
+          # On récupère tous les pourcentages du fichier dans l'ordre d'apparition
+          # Dans ton index.html :
+          #   1er % = Line Coverage (Project Summary)
+          #   2e % = Mutation Coverage (Project Summary)  ← celui qu’on veut
+          RAW_PCTS=$(grep -o '[0-9][0-9]*%' "$REPORT_FILE")
+          echo "All percents in index.html (in order): $RAW_PCTS"
 
-          # 1er pourcentage = 40% (Line Coverage), 2e = 34% (Mutation Coverage)
+          # On prend le 2e pourcentage
           SCORE=$(echo "$RAW_PCTS" | sed -n '2p' | tr -d '%')
 
-          # Sécurité: si jamais il n'y a pas de 2e pourcentage, on prend le dernier
+          # Sécurité : si jamais il n'y a pas de 2e %, on prend le dernier trouvé
           if [ -z "$SCORE" ]; then
             SCORE=$(echo "$RAW_PCTS" | tail -n1 | tr -d '%')
           fi
@@ -97,7 +103,6 @@ jobs:
 
           echo "Mutation coverage (percent only): $SCORE%"
           echo "mutation_score=$SCORE" >> "$GITHUB_OUTPUT"
-
 
       - name: Compare mutation score with previous run
         if: matrix.java-version == '24'
