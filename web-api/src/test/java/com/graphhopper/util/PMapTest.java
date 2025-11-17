@@ -17,12 +17,13 @@
  */
 package com.graphhopper.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class PMapTest {
-    /*
+    
     @Test
     public void singleStringPropertyCanBeRetrieved() {
         PMap subject = new PMap("foo=bar");
@@ -82,5 +83,5 @@ public class PMapTest {
         assertTrue(new PMap("").toMap().isEmpty());
         assertTrue(new PMap("name").toMap().isEmpty());
     }
-     */
+     
 }
