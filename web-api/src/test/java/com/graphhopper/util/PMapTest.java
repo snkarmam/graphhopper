@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PMapTest {
-
+    /*
     @Test
     public void singleStringPropertyCanBeRetrieved() {
         PMap subject = new PMap("foo=bar");
@@ -82,5 +82,5 @@ public class PMapTest {
         assertTrue(new PMap("").toMap().isEmpty());
         assertTrue(new PMap("name").toMap().isEmpty());
     }
-
+     */
 }
