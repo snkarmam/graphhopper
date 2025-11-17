@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -11,6 +12,7 @@
         GraphHopper is a fast and memory efficient Java road routing engine
         working seamlessly with OpenStreetMap data.
     </description>
+
     <parent>
         <groupId>com.graphhopper</groupId>
         <artifactId>graphhopper-parent</artifactId>
@@ -26,6 +28,7 @@
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <builddate>${maven.build.timestamp}</builddate>
     </properties>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -34,6 +37,7 @@
             <comments>A business-friendly OSS license</comments>
         </license>
     </licenses>
+
     <dependencies>
         <dependency>
             <groupId>com.graphhopper</groupId>
@@ -41,20 +45,24 @@
             <version>${project.parent.version}</version>
         </dependency>
 
-        <!-- depencency de mockito commence ici -->
+        <!-- Dépendances de test -->
 
+        <!-- Mockito : version gérée par le parent (5.19.0), donc pas de <version> ici -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.12.0</version> <!--  -->
             <scope>test</scope>
         </dependency>
 
+        <!-- Faker utilisé dans SimpleIntDequeTest -->
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>1.0.2</version>
+            <scope>test</scope>
+        </dependency>
 
-
-        <!-- depencency de mockito finit  ici -->
-
-
+        <!-- Dépendances "main" existantes -->
 
         <dependency>
             <groupId>com.carrotsearch</groupId>
@@ -69,6 +77,7 @@
             <groupId>org.locationtech.jts</groupId>
             <artifactId>jts-core</artifactId>
         </dependency>
+
         <!-- Jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -86,6 +95,7 @@
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
+
         <!-- for using CGIAR: elevation data importing via tif files-->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
@@ -98,6 +108,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>de.westnordost</groupId>
             <artifactId>osm-legal-default-speeds-jvm</artifactId>
@@ -114,6 +125,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <!-- use same kotlin version as okhttp uses in client-hc -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -126,10 +138,12 @@
             <artifactId>osmosis-osm-binary</artifactId>
             <version>0.48.3</version>
         </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -173,7 +187,6 @@
                         </goals>
                     </execution>
                 </executions>
-
                 <configuration>
                     <dotGitDirectory>${parent.basedir}/.git</dotGitDirectory>
                     <failOnNoGitDirectory>false</failOnNoGitDirectory>
