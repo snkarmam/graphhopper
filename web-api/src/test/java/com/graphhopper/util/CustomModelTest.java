@@ -33,7 +33,7 @@ public class CustomModelTest {
     @Test
     public void testMergeComparisonKeys() {
         CustomModel truck = new CustomModel();
-        truck.addToPriority(If("max_width < 3", MULTIPLY, "0"));
+        truck.addToPriority(If("max_width < 3", MULTIPL, "0"));
         CustomModel car = new CustomModel();
         car.addToPriority(If("max_width<2", MULTIPLY, "0"));
         CustomModel bike = new CustomModel();
