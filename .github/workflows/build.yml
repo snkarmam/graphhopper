@@ -144,47 +144,12 @@ jobs:
         if: matrix.java-version == '24'
         run: echo "${{ steps.mutation.outputs.mutation_score }}" > mutation-score.txt
 
+  
+
   rickroll-on-failure:
     needs: build
     if: failure()
     runs-on: ubuntu-latest
     steps:
-      - name: Rick Roll in logs
-        run: |
-          echo "Les tests ont échoué, never gonna give you up."
-          echo "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-
-      - name: Rick Roll in Summary
-        run: |
-          cat << 'EOF' >> "$GITHUB_STEP_SUMMARY"
-          ### Tests en échec = Rickroll automatique
-
-          Les tests ont échoué, never gonna give you up.
-
-          ![Rickroll](https://media.giphy.com/media/Vuw9m5wXviFIQ/giphy.gif)
-
-          [Voir la vidéo complète](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
-          EOF
-
-      - name: Rick Roll comment on PR
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const body = [
-              '### Tests en échec = Rickroll automatique',
-              '',
-              'Les tests ont échoué, never gonna give you up.',
-              '',
-              '![Rickroll](https://media.giphy.com/media/Vuw9m5wXviFIQ/giphy.gif)',
-              '',
-              '[Voir la vidéo complète](https://www.youtube.com/watch?v=dQw4w9WgXcQ)'
-            ].join('\n');
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body
-            });
+      - name: Rickroll action
+        uses: ./.github/actions/rickroll

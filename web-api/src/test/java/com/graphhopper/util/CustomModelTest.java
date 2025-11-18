@@ -18,21 +18,22 @@
 
 package com.graphhopper.util;
 
-import com.graphhopper.json.Statement;
-import org.junit.jupiter.api.Test;
-
 import java.util.Iterator;
 
-import static com.graphhopper.json.Statement.*;
-import static com.graphhopper.json.Statement.Op.MULTIPLY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import com.graphhopper.json.Statement;
+import static com.graphhopper.json.Statement.ElseIf;
+import static com.graphhopper.json.Statement.If;
+import static com.graphhopper.json.Statement.Op.MULTIPLY;
 
 public class CustomModelTest {
 
     @Test
     public void testMergeComparisonKeys() {
         CustomModel truck = new CustomModel();
-        truck.addToPriority(If("max_width < 3", MULTIPLY, "0"));
+        truck.addToPriority(If("max_width < 3", MULTIPLY, ""));
         CustomModel car = new CustomModel();
         car.addToPriority(If("max_width<2", MULTIPLY, "0"));
         CustomModel bike = new CustomModel();
