@@ -1,11 +1,5 @@
 name: "Rickroll on failure"
 description: "Affiche un Rickroll dans les logs, le résumé et la PR en cas d'échec"
-
-inputs:
-  github_token:
-    description: "GitHub token utilisé pour commenter sur les PR"
-    required: true
-
 runs:
   using: "composite"
   steps:
@@ -32,7 +26,7 @@ runs:
       if: ${{ github.event_name == 'pull_request' }}
       uses: actions/github-script@v7
       with:
-        github-token: ${{ inputs.github_token }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const body = [
             '### Tests en échec = Rickroll automatique',

@@ -145,19 +145,16 @@ jobs:
         run: echo "${{ steps.mutation.outputs.mutation_score }}" > mutation-score.txt
 
 
- rickroll-on-failure:
-    needs: build
-    if: failure()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  rickroll-on-failure:
+   needs: build
+   if: failure()
+   runs-on: ubuntu-latest
+   steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Rickroll action
-        uses: ./.github/actions/rickroll
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
+    - name: Rickroll action
+      uses: ./.github/actions/rickroll
       
 
   
