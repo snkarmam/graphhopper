@@ -29,7 +29,7 @@ import static com.graphhopper.json.Statement.If;
 import static com.graphhopper.json.Statement.Op.MULTIPLY;
 
 public class CustomModelTest {
-    /* 
+    
 
     @Test
     public void testMergeComparisonKeys() {
@@ -60,7 +60,7 @@ public class CustomModelTest {
         assertEquals(1, car.getPriority().size());
     }
 
-    */
+    
 
     @Test
     public void testMergeEmptyModel() {
