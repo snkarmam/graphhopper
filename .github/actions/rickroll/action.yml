@@ -19,7 +19,7 @@ runs:
       shell: bash
       run: |
         cat << 'EOF' >> "$GITHUB_STEP_SUMMARY"
-        ### Tests en échec = Rickroll automatique
+        ### Tests en échec 
 
         Les tests ont échoué, never gonna give you up.
 
@@ -35,7 +35,7 @@ runs:
         github-token: ${{ inputs.github_token }}
         script: |
           const body = [
-            '### Tests en échec = Rickroll automatique',
+            '### Tests en échec',
             '',
             'Les tests ont échoué, never gonna give you up.',
             '',
