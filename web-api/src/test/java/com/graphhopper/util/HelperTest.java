@@ -30,6 +30,102 @@ import static com.graphhopper.util.Helper.UTF_CS;
  */
 public class HelperTest {
 
+
+
+    // les tests mockitos commencent ici
+   
+
+    // test 1
+        @Test
+    public void testIsToString_withMockedInputStream_readsAllBytesAndClosesStream() throws Exception {
+        // Mock Mockito d'un InputStream :
+        // On simule un flux sans fichier réel, en contrôlant les bytes renvoyés.
+        java.io.InputStream inputStreamMock =
+                org.mockito.Mockito.mock(java.io.InputStream.class);
+
+        byte[] data = "hello\nworld".getBytes(Helper.UTF_CS);
+        java.util.concurrent.atomic.AtomicInteger pos = new java.util.concurrent.atomic.AtomicInteger(0);
+
+        // BufferedInputStream va appeler read(byte[], off, len) sur le flux sous-jacent.
+        org.mockito.Mockito.when(inputStreamMock.read(
+                        org.mockito.Mockito.any(byte[].class),
+                        org.mockito.Mockito.anyInt(),
+                        org.mockito.Mockito.anyInt()
+                ))
+                .thenAnswer(invocation -> {
+                    byte[] buffer = invocation.getArgument(0);
+                    int off = invocation.getArgument(1);
+                    int len = invocation.getArgument(2);
+
+                    int p = pos.get();
+                    if (p >= data.length) return -1;
+
+                    int n = Math.min(len, data.length - p);
+                    System.arraycopy(data, p, buffer, off, n);
+                    pos.addAndGet(n);
+                    return n;
+                });
+
+        // Appel de la méthode à tester
+        String result = Helper.isToString(inputStreamMock);
+
+        // Vérification du contenu lu
+        assertEquals("hello\nworld", result,
+                "Helper.isToString doit reconstruire exactement le contenu du flux");
+
+        // Vérifier que read() a été utilisée au moins une fois
+        org.mockito.Mockito.verify(inputStreamMock, org.mockito.Mockito.atLeastOnce())
+                .read(org.mockito.Mockito.any(byte[].class),
+                        org.mockito.Mockito.anyInt(),
+                        org.mockito.Mockito.anyInt());
+
+        // Vérifier que le flux est bien fermé (via BufferedInputStream.close())
+        org.mockito.Mockito.verify(inputStreamMock).close();
+
+        // NOTE: On ne fait PAS verifyNoMoreInteractions ici,
+        // car BufferedInputStream déclenche plusieurs read() internes.
+    }
+
+
+
+
+// test  2
+    @Test
+    public void testClose_withFailingCloseable_wrapsIOExceptionIntoRuntimeException() throws Exception {
+        // Mock Mockito d'un Closeable :
+        // On veut simuler une IOException lors de close().
+        java.io.Closeable closeableMock =
+                org.mockito.Mockito.mock(java.io.Closeable.class);
+
+        org.mockito.Mockito.doThrow(new java.io.IOException("boom"))
+                .when(closeableMock).close();
+
+        // Helper.close doit transformer l'IOException en RuntimeException.
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> Helper.close(closeableMock),
+                "Helper.close doit lever une RuntimeException si close() échoue");
+
+        assertEquals("Couldn't close resource", ex.getMessage(),
+                "Le message d'erreur doit être celui défini dans Helper.close");
+
+        // Vérifier que close() a bien été appelé
+        org.mockito.Mockito.verify(closeableMock).close();
+        org.mockito.Mockito.verifyNoMoreInteractions(closeableMock);
+    }
+
+
+
+
+
+
+
+    // les tests mockito finissent ici
+
+
+
+
+
+
     @Test
     public void testElevation() {
         assertEquals(9034.1, Helper.uIntToEle(Helper.eleToUInt(9034.1)), .1);
@@ -126,94 +222,7 @@ public class HelperTest {
 
 
 
-    // les tests mockitos commencent ici
-   
 
-    // test 1
-        @Test
-    public void testIsToString_withMockedInputStream_readsAllBytesAndClosesStream() throws Exception {
-        // Mock Mockito d'un InputStream :
-        // On simule un flux sans fichier réel, en contrôlant les bytes renvoyés.
-        java.io.InputStream inputStreamMock =
-                org.mockito.Mockito.mock(java.io.InputStream.class);
-
-        byte[] data = "hello\nworld".getBytes(Helper.UTF_CS);
-        java.util.concurrent.atomic.AtomicInteger pos = new java.util.concurrent.atomic.AtomicInteger(0);
-
-        // BufferedInputStream va appeler read(byte[], off, len) sur le flux sous-jacent.
-        org.mockito.Mockito.when(inputStreamMock.read(
-                        org.mockito.Mockito.any(byte[].class),
-                        org.mockito.Mockito.anyInt(),
-                        org.mockito.Mockito.anyInt()
-                ))
-                .thenAnswer(invocation -> {
-                    byte[] buffer = invocation.getArgument(0);
-                    int off = invocation.getArgument(1);
-                    int len = invocation.getArgument(2);
-
-                    int p = pos.get();
-                    if (p >= data.length) return -1;
-
-                    int n = Math.min(len, data.length - p);
-                    System.arraycopy(data, p, buffer, off, n);
-                    pos.addAndGet(n);
-                    return n;
-                });
-
-        // Appel de la méthode à tester
-        String result = Helper.isToString(inputStreamMock);
-
-        // Vérification du contenu lu
-        assertEquals("hello\nworld", result,
-                "Helper.isToString doit reconstruire exactement le contenu du flux");
-
-        // Vérifier que read() a été utilisée au moins une fois
-        org.mockito.Mockito.verify(inputStreamMock, org.mockito.Mockito.atLeastOnce())
-                .read(org.mockito.Mockito.any(byte[].class),
-                        org.mockito.Mockito.anyInt(),
-                        org.mockito.Mockito.anyInt());
-
-        // Vérifier que le flux est bien fermé (via BufferedInputStream.close())
-        org.mockito.Mockito.verify(inputStreamMock).close();
-
-        // NOTE: On ne fait PAS verifyNoMoreInteractions ici,
-        // car BufferedInputStream déclenche plusieurs read() internes.
-    }
-
-
-
-
-// test  2
-    @Test
-    public void testClose_withFailingCloseable_wrapsIOExceptionIntoRuntimeException() throws Exception {
-        // Mock Mockito d'un Closeable :
-        // On veut simuler une IOException lors de close().
-        java.io.Closeable closeableMock =
-                org.mockito.Mockito.mock(java.io.Closeable.class);
-
-        org.mockito.Mockito.doThrow(new java.io.IOException("boom"))
-                .when(closeableMock).close();
-
-        // Helper.close doit transformer l'IOException en RuntimeException.
-        RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> Helper.close(closeableMock),
-                "Helper.close doit lever une RuntimeException si close() échoue");
-
-        assertEquals("Couldn't close resource", ex.getMessage(),
-                "Le message d'erreur doit être celui défini dans Helper.close");
-
-        // Vérifier que close() a bien été appelé
-        org.mockito.Mockito.verify(closeableMock).close();
-        org.mockito.Mockito.verifyNoMoreInteractions(closeableMock);
-    }
-
-
-
-
-
-
-
-    // les tests mockito finissent ici
 
 
 
