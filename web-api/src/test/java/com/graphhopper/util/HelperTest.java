@@ -191,7 +191,7 @@ public class HelperTest {
         java.io.Closeable closeableMock =
                 org.mockito.Mockito.mock(java.io.Closeable.class);
 
-       // org.mockito.Mockito.doThrow(new java.io.IOException("boom"))
+        org.mockito.Mockito.doThrow(new java.io.IOException("boom"))
                 .when(closeableMock).close();
 
         // Helper.close doit transformer l'IOException en RuntimeException.
