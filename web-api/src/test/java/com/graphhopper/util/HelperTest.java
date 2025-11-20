@@ -129,6 +129,7 @@ public class HelperTest {
     // les tests mockitos commencent ici
    
 
+    // test 1
         @Test
     public void testIsToString_withMockedInputStream_readsAllBytesAndClosesStream() throws Exception {
         // Mock Mockito d'un InputStream :
@@ -182,7 +183,7 @@ public class HelperTest {
 
 
 
-
+// test 2
     @Test
     public void testClose_withFailingCloseable_wrapsIOExceptionIntoRuntimeException() throws Exception {
         // Mock Mockito d'un Closeable :
@@ -190,7 +191,7 @@ public class HelperTest {
         java.io.Closeable closeableMock =
                 org.mockito.Mockito.mock(java.io.Closeable.class);
 
-        org.mockito.Mockito.doThrow(new java.io.IOException("boom"))
+       // org.mockito.Mockito.doThrow(new java.io.IOException("boom"))
                 .when(closeableMock).close();
 
         // Helper.close doit transformer l'IOException en RuntimeException.

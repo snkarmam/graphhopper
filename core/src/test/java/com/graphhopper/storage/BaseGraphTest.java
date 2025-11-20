@@ -17,23 +17,35 @@
  */
 package com.graphhopper.storage;
 
-import com.carrotsearch.hppc.IntArrayList;
-import com.graphhopper.routing.ev.EnumEncodedValue;
-import com.graphhopper.routing.ev.RoadClass;
-import com.graphhopper.search.KVStorage.KValue;
-import com.graphhopper.util.*;
-import com.graphhopper.util.shapes.BBox;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.carrotsearch.hppc.IntArrayList;
+import com.graphhopper.routing.ev.EnumEncodedValue;
+import com.graphhopper.routing.ev.RoadClass;
+import com.graphhopper.search.KVStorage.KValue;
+import com.graphhopper.util.EdgeExplorer;
+import com.graphhopper.util.EdgeIterator;
+import com.graphhopper.util.EdgeIteratorState;
 import static com.graphhopper.util.EdgeIteratorState.REVERSE_STATE;
-import static com.graphhopper.util.FetchMode.*;
+import static com.graphhopper.util.FetchMode.BASE_AND_PILLAR;
+import static com.graphhopper.util.FetchMode.PILLAR_AND_ADJ;
+import static com.graphhopper.util.FetchMode.PILLAR_ONLY;
+import static com.graphhopper.util.FetchMode.TOWER_ONLY;
+import com.graphhopper.util.GHUtility;
+import com.graphhopper.util.Helper;
 import static com.graphhopper.util.Parameters.Details.STREET_NAME;
-import static org.junit.jupiter.api.Assertions.*;
+import com.graphhopper.util.shapes.BBox;
 
 /**
  * @author Peter Karich
@@ -63,7 +75,7 @@ public class BaseGraphTest extends AbstractGraphStorageTester {
     // les mockitos commencent ici
 
 
-
+// test 1
     @Test
     public void testBuilder_withTurnCostsEnabled_wrapWeightingReturnsSameInstance() {
         // Mockito mocks pour deux dépendances différentes :
@@ -103,6 +115,8 @@ public class BaseGraphTest extends AbstractGraphStorageTester {
         }
     }
 
+    // test 2
+
     @Test
     public void testBuilder_withTurnCostsDisabled_wrapWeightingReturnsSameInstance() {
         com.graphhopper.routing.util.EncodingManager encodingManagerMock =
@@ -134,6 +148,8 @@ public class BaseGraphTest extends AbstractGraphStorageTester {
         }
     }
 
+    // test 3
+
     @Test
     public void testCreateEdgeExplorer_withMockedEdgeFilter_usesFilterToDecideEdges() {
         BaseGraph graph = createGHStorage();
@@ -158,6 +174,8 @@ public class BaseGraphTest extends AbstractGraphStorageTester {
         org.mockito.Mockito.verify(filter, org.mockito.Mockito.atLeastOnce())
                 .accept(org.mockito.Mockito.any());
     }
+
+    // test 4
 
     @Test
     public void testSortEdges_withMockedIntUnaryOperator_invokesMappingFunction() {
