@@ -183,7 +183,7 @@ public class HelperTest {
 
 
 
-// test 2
+// test  2
     @Test
     public void testClose_withFailingCloseable_wrapsIOExceptionIntoRuntimeException() throws Exception {
         // Mock Mockito d'un Closeable :
