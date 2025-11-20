@@ -127,7 +127,7 @@ public class HelperTest {
 
 
     // les tests mockitos commencent ici
-    // les tests mockitos commencent ici
+   
 
         @Test
     public void testIsToString_withMockedInputStream_readsAllBytesAndClosesStream() throws Exception {
@@ -208,7 +208,6 @@ public class HelperTest {
 
 
 
-    // les tests mockito finissent ici
 
 
 

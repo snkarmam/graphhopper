@@ -21,7 +21,7 @@
             <artifactId>jackson-core</artifactId>
         </dependency>
 
-        <!-- dépendance de mockito commence ici -->
+        <!-- dépendance de mockito commence ici ... -->
         <!-- Mockito : version gérée par le parent (5.19.0), donc pas de <version> ici -->
         <dependency>
             <groupId>org.mockito</groupId>
